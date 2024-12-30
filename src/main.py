@@ -13,8 +13,16 @@ def generate():
 
 def main():
 	print("INFO: Starting...")
+
+	# DO: load target chats
+	# DO: load their conversations
+
+	# DO: generate_msg(conversation: list[str]) -> str
 	msg = generate()
 	ic(msg)
+
+	# DO: send the response _from your name_ // for starters do with a bot, but keep in mind that that's much easier
+	print(f"DBG: to send: {msg}")
 
 
 if __name__ == "__main__":

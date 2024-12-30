@@ -1,6 +1,6 @@
 # PROJECT_NAME_PLACEHOLDER
 
-![Lines Of Code](https://img.shields.io/badge/LoC-77-lightblue)
+![Lines Of Code](https://img.shields.io/badge/LoC-78-lightblue)
 
 <!-- markdownlint-disable -->
 <details>
