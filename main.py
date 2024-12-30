@@ -1,6 +1,12 @@
-def generate(message: str):
-    message = "hi happy new year"
-    return message
+def generate():
+	m = "hi happy new year"
+	return m
 
-def send(message: str):
-    print(message)
+
+def main():
+	print("INFO: Starting...")
+	generate()
+
+
+if __name__ == "__main__":
+	main()
