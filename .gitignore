@@ -51,8 +51,10 @@ venv/
 *.exe
 *.exe~
 *.dll
-\n
+
+
 ## Python
 .upload_py_lib.sh
 **/__pycache__/
 .py-env/
+**/*.session
