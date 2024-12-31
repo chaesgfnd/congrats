@@ -1,7 +1,7 @@
 from typing import Any, Self, Union, Optional, List, Tuple, Callable, TypeVar, Generic  # noqa: F401
 from telethon import TelegramClient
 from generate import generate
-import os
+import os, sys
 
 try:
 	from icecream import ic  # noqa: F401
@@ -12,7 +12,7 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 REPEATS_FILE_PATH = os.path.expanduser("~/.local/share/congrats/repeats.txt")
 
 
-def run(client: TelegramClient, user: str):
+def run(client: TelegramClient, user: str, execute=True):
 	with client:
 		messages = client.loop.run_until_complete(client.get_messages(user, limit=20))
 
@@ -23,10 +23,11 @@ def run(client: TelegramClient, user: str):
 	msg = generate(message_contents)
 	print(f"{user=}\n{msg=}\n#---------------------")
 
-	with client:
-		client.loop.run_until_complete(client.send_message(user, msg))
-		with open(REPEATS_FILE_PATH, "a") as f:
-			f.write(f"{user}\n")
+	if execute:
+		with client:
+			client.loop.run_until_complete(client.send_message(user, msg))
+			with open(REPEATS_FILE_PATH, "a") as f:
+				f.write(f"{user}\n")
 
 
 def filter_out_repeats(target_users: list[str]) -> list[str]:
@@ -55,14 +56,24 @@ def main():
 	username = "chaesgfnd"
 	client = TelegramClient(username, api_id, api_hash)
 
-	considered_users = ["Elena_Kletskova", "valeratrades"]
-	users = filter_out_repeats(considered_users)
+	users = ["Elena_Kletskova", "valeratrades", "chaengfnd"]
+
+	# TODO: flag "--no-repeat"
+	execute = True
+	args = sys.argv
+	if args.__len__() > 1:
+		flag = args[1]
+		if flag == "--dry":
+			execute = False
+		elif flag == "--no-repeat":
+			users = filter_out_repeats(users)
+
 	print(f"INFO: gonna congratulate: {users}")
 
 	# TODO: async it
 	# loop = asyncio.get_event_loop()
 	for user in users:
-		run(client, user)
+		run(client, user, execute)
 
 
 if __name__ == "__main__":
