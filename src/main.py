@@ -1,6 +1,5 @@
 from typing import Any, Self, Union, Optional, List, Tuple, Callable, TypeVar, Generic  # noqa: F401
-from telethon import TelegramClient
-import asyncio
+from telethon import TelegramClient, Message
 
 try:
 	from icecream import ic  # noqa: F401
@@ -19,15 +18,18 @@ def generate(messages: list[str]) -> str:
 
 
 def run(client: TelegramClient, user: str):
-	messages = client.get_messages(user, limit=10)
-	for message in messages:
-		return message.text
+	with client:
+		messages: list[Message] = client.loop.run_until_complete(client.get_messages(user, limit=10))
 
-	msg = generate()
+		message_contents: list[str] = []
+		for message in messages:
+			message_contents.append(message.text)
+
+	msg = generate(message_contents)
 	print(f"{msg=}")
 
-	with client:
-		client.loop.run_until_complete(client.send_message(user, msg))
+	# with client:
+	# client.loop.run_until_complete(client.send_message(user, msg))
 
 
 def main():
