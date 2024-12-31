@@ -1,5 +1,7 @@
 from typing import Any, Self, Union, Optional, List, Tuple, Callable, TypeVar, Generic  # noqa: F401
-from telethon import TelegramClient, Message
+from telethon import TelegramClient
+from generate import generate
+import os
 
 try:
 	from icecream import ic  # noqa: F401
@@ -7,29 +9,42 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 	ic = lambda *a: None if not a else (a[0] if len(a) == 1 else a)  # noqa
 
 
-# TODO: implement
-def generate(messages: list[str]) -> str:
-	"""
-	generates a cohesive response based on the previous messages in the conversation
-	"""
-
-	s = "happy new year, unless you were naughty. Naughty naughty"
-	return s
+REPEATS_FILE_PATH = os.path.expanduser("~/.local/share/congrats/repeats.txt")
 
 
 def run(client: TelegramClient, user: str):
 	with client:
-		messages: list[Message] = client.loop.run_until_complete(client.get_messages(user, limit=10))
+		messages = client.loop.run_until_complete(client.get_messages(user, limit=20))
 
 		message_contents: list[str] = []
 		for message in messages:
 			message_contents.append(message.text)
 
 	msg = generate(message_contents)
-	print(f"{msg=}")
+	print(f"{user=}\n{msg=}\n#---------------------")
 
-	# with client:
-	# client.loop.run_until_complete(client.send_message(user, msg))
+	with client:
+		client.loop.run_until_complete(client.send_message(user, msg))
+		with open(REPEATS_FILE_PATH, "a") as f:
+			f.write(f"{user}\n")
+
+
+def filter_out_repeats(target_users: list[str]) -> list[str]:
+	os.makedirs(os.path.dirname(REPEATS_FILE_PATH), exist_ok=True)
+	try:
+		with open(REPEATS_FILE_PATH, "r") as f:
+			repeats_str = f.read()
+	except:
+		return target_users
+
+	repeats = repeats_str.split("\n")
+
+	out_users = []
+	for user in target_users:
+		if not user in repeats:
+			out_users.append(user)
+
+	return out_users
 
 
 def main():
@@ -40,7 +55,10 @@ def main():
 	username = "chaesgfnd"
 	client = TelegramClient(username, api_id, api_hash)
 
-	users = ["me", "@valeratrades"]
+	considered_users = ["Elena_Kletskova", "valeratrades"]
+	users = filter_out_repeats(considered_users)
+	print(f"INFO: gonna congratulate: {users}")
+
 	# TODO: async it
 	# loop = asyncio.get_event_loop()
 	for user in users:

@@ -12,6 +12,8 @@ pkgs.mkShell {
       python-pkgs: with python-pkgs; [
         numpy
         telethon
+				openai
+				requests
       ]
     ))
   ];
