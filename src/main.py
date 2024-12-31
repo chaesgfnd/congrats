@@ -9,17 +9,25 @@ except ImportError:  # Graceful fallback if IceCream isn't installed.
 
 
 # TODO: implement
-def generate():
+def generate(messages: list[str]) -> str:
+	"""
+	generates a cohesive response based on the previous messages in the conversation
+	"""
+
 	s = "happy new year, unless you were naughty. Naughty naughty"
 	return s
 
 
 def run(client: TelegramClient, user: str):
+	messages = client.get_messages(user, limit=10)
+	for message in messages:
+		return message.text
+
 	msg = generate()
 	print(f"{msg=}")
 
 	with client:
-		client.loop.run_until_complete(client.send_message(user, "Hello, myself!"))
+		client.loop.run_until_complete(client.send_message(user, msg))
 
 
 def main():
